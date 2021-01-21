@@ -12,23 +12,20 @@ module.exports = (options = {}) => ({
       const input = [{ name: args.path, contents }];
       const errors = [];
       const warnings = [];
-      const cache = new Map;
-      cache.set(args.path, contents);
+      const cache = Object.create(null);
+      cache[args.path] = contents;
 
       const fileAccess = (filePath, relativeTo) => {
         const name = path.join(path.dirname(relativeTo), filePath);
-        if (cache.has(name)) return cache.get(name);
-        const contents = fs.readFileSync(name, 'utf8');
-        const value = { name, contents };
-        cache.set(name, value);
-        return value;
+        const contents = cache[name] || (cache[name] = fs.readFileSync(name, 'utf8'));
+        return { name, contents };
       };
 
       for (const { kind, text, range } of glslx.compileIDE(input, { fileAccess }).diagnostics) {
         const message = { text };
 
         if (range) {
-          const lineText = cache.get(range.source).contents.split(/\r|\n|\r\n/g)[range.start.line];
+          const lineText = cache[range.source].split(/\r|\n|\r\n/g)[range.start.line];
           message.location = {
             file: range.source,
             line: range.start.line + 1,
