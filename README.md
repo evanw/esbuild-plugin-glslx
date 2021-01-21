@@ -19,7 +19,13 @@ export void yourFragmentShader() {
 
 ## Basic Usage
 
-1. Add this plugin to your esbuild build script:
+1. Install this plugin in your project:
+
+    ```sh
+    npm install --save-dev esbuild-plugin-glslx
+    ```
+
+2. Add this plugin to your esbuild build script:
 
     ```diff
     +const glslxPlugin = require('esbuild-plugin-glslx')
@@ -32,7 +38,7 @@ export void yourFragmentShader() {
      })
     ```
 
-2. Import your `*.glslx` file from JavaScript:
+3. Import your `*.glslx` file from JavaScript:
 
     ```js
     import { yourVertexShader, yourFragmentShader } from './shaders.glslx'
