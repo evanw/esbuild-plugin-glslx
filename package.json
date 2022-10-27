@@ -7,6 +7,6 @@
   "main": "./main.js",
   "types": "./main.d.ts",
   "dependencies": {
-    "glslx": "0.2.11"
+    "glslx": "0.3.0"
   }
 }
