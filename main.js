@@ -1,9 +1,13 @@
 const glslx = require('glslx');
 
-module.exports = (options = {}) => ({
+module.exports = ({
+  writeTypeDeclarations = false,
+  prettyPrint = true,
+  disableRewriting = true,
+  renaming = 'none'
+} = {}) => ({
   name: 'glslx',
   setup(build) {
-    const writeTypeDeclarations = !!(options && options.writeTypeDeclarations);
     const path = require('path');
     const fs = require('fs');
 
@@ -54,9 +58,9 @@ module.exports = (options = {}) => ({
       const json = JSON.parse(glslx.compile(input, {
         format: 'json',
         fileAccess,
-        prettyPrint: true,
-        disableRewriting: true,
-        renaming: 'none',
+        prettyPrint,
+        disableRewriting,
+        renaming,
       }).output);
 
       let js = '';
