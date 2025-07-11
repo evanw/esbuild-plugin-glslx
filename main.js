@@ -3,7 +3,16 @@ const glslx = require('glslx');
 module.exports = (options = {}) => ({
   name: 'glslx',
   setup(build) {
-    const writeTypeDeclarations = !!(options && options.writeTypeDeclarations);
+    const initialOptions = build.initialOptions;
+    const minifyIdentifiers = initialOptions.minify || initialOptions.minifyIdentifiers;
+    const minifySyntax = initialOptions.minify || initialOptions.minifySyntax;
+    const minifyWhitespace = initialOptions.minify || initialOptions.minifyWhitespace;
+
+    const renaming = options.renaming;
+    const disableRewriting = options.disableRewriting;
+    const prettyPrint = options.prettyPrint;
+    const writeTypeDeclarations = options.writeTypeDeclarations;
+
     const path = require('path');
     const fs = require('fs');
 
@@ -54,16 +63,28 @@ module.exports = (options = {}) => ({
       const json = JSON.parse(glslx.compile(input, {
         format: 'json',
         fileAccess,
-        prettyPrint: true,
-        disableRewriting: true,
-        renaming: 'none',
+        renaming: renaming !== undefined ? renaming : (minifyIdentifiers ? 'internal-only' : 'none'),
+        disableRewriting: disableRewriting !== undefined ? disableRewriting : !minifySyntax,
+        prettyPrint: prettyPrint !== undefined ? prettyPrint : !minifyWhitespace,
       }).output);
 
       let js = '';
       let ts = '';
+      let newline = false;
       for (const shader of json.shaders) {
-        js += `export var ${shader.name} = ${JSON.stringify(shader.contents)};\n`;
-        ts += `export var ${shader.name}: string;\n`;
+        js += `export const ${shader.name} = ${JSON.stringify(shader.contents)};\n`;
+        ts += `export const ${shader.name}: string;\n`;
+        newline = true;
+      }
+      for (const key in json.renaming) {
+        if (newline) {
+          js += '\n';
+          ts += '\n';
+          newline = false;
+        }
+        const value = json.renaming[key]
+        js += `export const ${key} = ${JSON.stringify(value)};\n`;
+        ts += `export const ${key} = ${JSON.stringify(key)};\n`;
       }
       if (writeTypeDeclarations) {
         await fs.promises.writeFile(args.path + '.d.ts', ts);
