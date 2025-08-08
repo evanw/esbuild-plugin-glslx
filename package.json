@@ -1,7 +1,7 @@
 {
   "name": "esbuild-plugin-glslx",
   "description": "A plugin for esbuild that enables importing *.glslx files.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "repository": "https://github.com/evanw/esbuild-plugin-glslx",
   "main": "./main.js",
