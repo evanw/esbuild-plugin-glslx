@@ -1,21 +1,46 @@
 # esbuild-plugin-glslx
 
-A plugin for [esbuild](https://github.com/evanw/esbuild) that adds support for `*.glslx` file imports including shader type checking at build time. [GLSLX](https://github.com/evanw/glslx) is a language extension for GLSL that lets you write multiple WebGL 1.0 shaders in the same file using the `export` keyword. It comes with a [GLSLX Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=evanw.glslx-vscode) that enables standard IDE features for GLSLX including type checking, go-to-definition, symbol renaming, and format-on-save. GLSLX code looks something like this:
+A plugin for [esbuild](https://github.com/evanw/esbuild) that adds support for `*.glslx` file imports including shader type checking at build time. [GLSLX](https://github.com/evanw/glslx) is a language extension for GLSL that lets you write multiple WebGL shaders in the same file using `@vertex` and `@fragment` function annotations. It comes with a [GLSLX Visual Studio Code extension](https://marketplace.visualstudio.com/items?itemName=evanw.glslx-vscode) that enables standard IDE features for GLSLX including type checking, go-to-definition, symbol renaming, and format-on-save. GLSLX code looks something like this:
 
-```glsl
-uniform sampler2D tex;
-attribute vec3 pos;
-varying vec2 coord;
+- WebGL 1
 
-export void yourVertexShader() {
-  coord = pos.xy;
-  gl_Position = vec4(pos, 1);
-}
+    ```glsl
+    uniform sampler2D tex;
+    attribute vec3 pos;
+    varying vec2 coord;
 
-export void yourFragmentShader() {
-  gl_FragColor = texture2D(tex, coord);
-}
-```
+    @vertex
+    void yourVertexShader() {
+      coord = pos.xy;
+      gl_Position = vec4(pos, 1);
+    }
+
+    @fragment
+    void yourFragmentShader() {
+      gl_FragColor = texture2D(tex, coord);
+    }
+    ```
+
+- WebGL 2
+
+    ```glsl
+    #version 300 es
+    uniform sampler2D tex;
+    in vec3 pos;
+    inout vec2 coord;
+    out vec4 color;
+
+    @vertex
+    void yourVertexShader() {
+      coord = pos.xy;
+      gl_Position = vec4(pos, 1);
+    }
+
+    @fragment
+    void yourFragmentShader() {
+      color = texture(tex, coord);
+    }
+    ```
 
 ## Basic Usage
 
